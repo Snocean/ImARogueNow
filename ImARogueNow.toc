@@ -1,0 +1,8 @@
+## Interface: 11500
+## Title: I'm a Rogue now
+## Notes: Enables the pickpocket skill for any player
+## Author: EffinOwen
+## Version: 1.0
+## SavedVariables:
+
+ImARogueNow.lua
