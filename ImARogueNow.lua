@@ -1,28 +1,109 @@
 -- ImARogueNow.lua
 --math.randomseed()
---search strings
-local search = {
-    5370,
-	9647,
-	4582,
-	17408,
+
+--Loot tables
+
+local common = {
+	5370,
 	18227,
 	18230,
 	20030,
 	5368,
 	5431,
-	204905,
-	209041,
+	5428,
+	1520,
 	5263,
+	209041,
 	6662,
+	4582,
+	17408,
+	204905,
 	209845,
 	209849,
 	12037,
-	8350,
-	5428,
 	13523,
-	19019	
+	939,
+	9329,
+	3317,
+	12467,
+	23215,
+	1006,
+	21037,
+	23578,
+	21830,
+	20387,
+	12814,
+	22260,
+	21823,
+	13585,
+	19943,
+	7339,
+	7338,
+	210765,
+	19483,
+	23722,
+	12924,
+	15875,
+	8243,
+	7342,
+	20604,
+	23579,
+	7337,
+	23211,
+	190307,
+	18231,
+	18229,
+	18365,
+	18233,
+	18228,
+	4499,
+	6083,
+	17035,
+	6651
 }
+
+local rare = {
+    9647,
+	8350,
+	11116,
+	9648,
+	3567,
+	19814,
+	11905,
+	11902,
+	14180,
+	5611,
+	6327,
+	18358,
+	11930,
+	13139,
+	10758,
+	21103,
+	18703,
+	20383,
+	19944,
+	20644,
+	19382,
+	191481,
+	19321
+}
+
+local legendary = {
+    21103,
+	18703,
+	20383,
+	19944,
+	20644,
+	19382,
+	191481,
+	19321,
+	19019,
+	17182,
+	22589,
+	21176,
+	19017
+}
+
 
 -- Initialize the ImARogueNow table
 ImARogueNow = {}
@@ -31,21 +112,31 @@ ImARogueNow.frame = CreateFrame("Frame")
 -- Welcome message
 local function OnAddonLoaded()
     print("|cff00ff00You're a Rogue Now! Type /ppcache to avoid failed pickpockets, then target a player and do /pp or /pickpocket to start!|r")
+	PickPocketItemCache()
 end
 
 -- Pre Cache items
 function PickPocketItemCache()
 	print("Checking for cached items now:")
-    for _, itemID in ipairs(search) do
+    for _, itemID in ipairs(common) do
             local itemLink = select(2, GetItemInfo(itemID))
             if not itemLink then
                 print("|cffff0000Item ID " .. itemID .. " does not return a valid item link. Item not cached yet.|r")
-			else
-            -- Green color: |cff00ff00
-            print("|cff00ff00Item ID " .. itemID .. " cached.|r")
 			end
     end
-	print("Cache check complete, if any items did not return a valid item link please retry /ppcache in around 30 seconds")
+	for _, itemID in ipairs(rare) do
+            local itemLink = select(2, GetItemInfo(itemID))
+            if not itemLink then
+                print("|cffff0000Item ID " .. itemID .. " does not return a valid item link. Item not cached yet.|r")
+			end
+    end
+	for _, itemID in ipairs(legendary) do
+            local itemLink = select(2, GetItemInfo(itemID))
+            if not itemLink then
+                print("|cffff0000Item ID " .. itemID .. " does not return a valid item link. Item not cached yet.|r")
+			end
+    end
+	print("Cache check complete, if any items did not return a valid item link please retry /ppcache in around 10 seconds")
 end
 
 -- Register for events
@@ -76,37 +167,51 @@ function PickPocket()
     -- Check if the player has a target
     if UnitExists("target") then --and UnitIsPlayer("target") then
         local Target = UnitName("target")
-
-        -- Perform a random roll
-        local roll = math.random(1, 20) -- Roll based on the number of items in search
-		local quantity = math.random(1,5)
+		
+        -- Perform random rolls
+		local rarity = math.random(1,10)
+        local rollcommon = math.random(1, #common) -- Roll based on the number of items in common
+		local rollrare = math.random(1, #rare) -- Roll based on the number of items in common
+		local rollLegendary = math.random(1, #legendary) -- Roll based on the number of items in common
 		
 		-- Disabled DnD roll style check, felt like it was bloating the chat window with too much text
 		-- SendChatMessage("attempts to pickpocket " .. Target .. " and rolls a " .. roll .. " on their dexterity check.", "EMOTE", nil)
-		
-        -- Get item link from the item ID
-        local itemID = search[roll]
-        local itemLink = select(2, GetItemInfo(itemID))
+		-- Rarity rolls
+		if rarity <= 5 then
+			-- Get item link from the item ID
+			local itemID = common[rollcommon]
+			local itemLink = select(2, GetItemInfo(itemID))
 
-        -- Check if item link is retrieved and send message
-		if itemLink then
-			if roll == 1 then
-				SendChatMessage("pickpockets " .. Target .. " and loots a " .. itemLink, "EMOTE")
-			elseif roll >= 2 and roll <= 7 then
-				SendChatMessage("pickpockets " .. Target .. " and loots a " .. itemLink, "EMOTE")
-			elseif roll >= 8 and roll <= 10 then
-				SendChatMessage("pickpockets " .. Target .. " and loots an " .. itemLink, "EMOTE")
-			elseif roll >= 11 and roll <= 13 then
-				SendChatMessage("pickpockets " .. Target .. " and loots " .. quantity .. " " .. itemLink, "EMOTE")
-			elseif roll >= 14 and roll <= 18 then
-				SendChatMessage("pickpockets " .. Target .. " and loots " .. itemLink, "EMOTE")
-			elseif roll == 19 then
-				SendChatMessage("pickpockets " .. Target .. " and loots the " .. itemLink, "EMOTE")
-			elseif roll == 20 then
-				SendChatMessage("pickpockets " .. Target .. " and loots " .. itemLink, "EMOTE")
-			end	
-        else
+			-- Check if item link is retrieved and send message
+			if itemLink and itemID == 17035 then
+					SendChatMessage("pickpockets " .. Target .. " and loots 11 " .. itemLink, "EMOTE")
+			elseif itemLink then
+					SendChatMessage("pickpockets " .. Target .. " and loots " .. itemLink, "EMOTE")
+			else
             SendChatMessage("fails their pickpocket attempt!", "EMOTE", nil)
+			end	
+		elseif rarity >= 6 and rarity <= 9 then
+			-- Get item link from the item ID
+			local itemID = rare[rollrare]
+			local itemLink = select(2, GetItemInfo(itemID))
+
+			-- Check if item link is retrieved and send message
+			if itemLink then
+					SendChatMessage("pickpockets " .. Target .. " and loots " .. itemLink, "EMOTE")
+			else
+            SendChatMessage("fails their pickpocket attempt!", "EMOTE", nil)
+			end
+		elseif rarity == 10 then
+			-- Get item link from the item ID
+			local itemID = legendary[rollLegendary]
+			local itemLink = select(2, GetItemInfo(itemID))
+
+			-- Check if item link is retrieved and send message
+			if itemLink then
+					SendChatMessage("pickpockets " .. Target .. " and loots " .. itemLink, "EMOTE")
+			else
+            SendChatMessage("fails their pickpocket attempt!", "EMOTE", nil)
+			end	
         end
     else
         SendChatMessage("has no pickpocket target...", "EMOTE", nil)		
